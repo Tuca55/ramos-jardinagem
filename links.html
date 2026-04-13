@@ -15,8 +15,8 @@
         
         .logo { width: 100px; height: 100px; background: var(--verde-escuro); border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 14px; }
         
-        h1 { font-size: 22px; color: var(--verde-escuro); margin-bottom: 5px; }
-        p { font-size: 14px; color: #666; margin-bottom: 25px; }
+        h1 { font-size: 22px; color: var(--verde-escuro); margin-bottom: 8px; }
+        .bio { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 25px; padding: 0 10px; }
 
         .btn-link { display: block; background: white; color: var(--verde-escuro); text-decoration: none; padding: 18px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #ddd; }
         .btn-link:hover { transform: translateY(-3px); background: var(--verde-escuro); color: white; }
@@ -37,22 +37,26 @@
 
 <div class="container">
     <div class="logo">RAMOS</div>
-    <h1>Olá, Parceiro!</h1>
-    <p>Seja bem-vindo ao portal da Ramos Jardinagem.</p>
+    <h1>Ramos Jardinagem</h1>
+    <p class="bio">
+        🌿 <strong>Criando cenários, cultivando bem-estar.</strong><br>
+        A Ramos Jardinagem une a beleza das plantas com a praticidade que você busca. 
+        Este é o espaço exclusivo para nossos parceiros crescerem junto com a gente!
+    </p>
 
     <a href="index.html" class="btn-link btn-destaque">➕ Indicar Novo Cliente</a>
     <a href="parceiro.html" class="btn-link">📊 Ver Minhas Indicações</a>
 
     <h2 style="font-size: 16px; color: var(--verde-escuro); margin-top: 40px;">Galeria de Serviços</h2>
-    <p style="margin-bottom: 15px;">Mostre nosso trabalho para o cliente!</p>
+    <p style="margin-bottom: 15px; font-size: 14px; color: #666;">Use estas fotos para apresentar nosso trabalho:</p>
 
     <div class="carousel">
         <div class="slides" id="slides">
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/antes.jpeg" alt="Equipe Ramos"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/depois.jpeg" alt="Antes e Depois"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa.jpeg" alt="Serviço 3"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa2.jpeg" alt="Serviço 4"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa3.jpeg" alt="Serviço 5"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/antes.jpeg" alt="Antes"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/depois.jpeg" alt="Depois"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa.jpeg" alt="Equipe Ramos"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa2.jpeg" alt="Nossa Equipe"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa3.jpeg" alt="Excelência no Serviço"></div>
         </div>
     </div>
     <div class="dots" id="dots">
@@ -63,7 +67,7 @@
         <div class="dot"></div>
     </div>
 
-    <p style="margin-top: 40px; font-size: 12px;">Ramos Jardinagem &copy; 2026</p>
+    <p style="margin-top: 40px; font-size: 12px; color: #999;">Ramos Jardinagem &copy; 2026</p>
 </div>
 
 <script>
@@ -73,7 +77,7 @@
 
     function showSlide() {
         index++;
-        if (index >= 5) index = 0; // Se você tiver menos fotos, mude o 5 para a quantidade real
+        if (index >= 5) index = 0;
         
         slides.style.transform = `translateX(${-index * 100}%)`;
         
@@ -81,7 +85,7 @@
         if(dots[index]) dots[index].classList.add('active');
     }
 
-    setInterval(showSlide, 3500); // Troca a cada 3.5 segundos
+    setInterval(showSlide, 3500);
 </script>
 
 </body>
