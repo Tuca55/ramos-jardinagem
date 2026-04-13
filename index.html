@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ramos Jardinagem - Parceiros</title>
+    <style>
+        :root {
+            --verde-escuro: #2d5a27;
+            --verde-claro: #8eb057;
+            --bege: #f4f1ea;
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--bege);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 { color: var(--verde-escuro); text-align: center; font-size: 24px; }
+        p { text-align: center; font-size: 14px; color: #666; }
+        
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            background-color: var(--verde-escuro);
+            color: white;
+            border: none;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background-color: var(--verde-claro); }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🌿 Ramos Jardinagem</h1>
+        <p>Indique um cliente e ganhe sua comissão!</p>
+
+        <form id="formIndicacao">
+            <label>Seu Nome (Piscineiro)</label>
+            <input type="text" id="nomePiscineiro" placeholder="Ex: João Silva" required>
+
+            <label>Seu WhatsApp</label>
+            <input type="tel" id="whatsappPiscineiro" placeholder="(00) 00000-0000" required>
+
+            <hr style="margin-top: 20px; border: 0.5px solid #eee;">
+
+            <label>Nome do Cliente</label>
+            <input type="text" id="nomeCliente" placeholder="Dono da residência" required>
+
+            <label>Endereço ou Condomínio</label>
+            <input type="text" id="enderecoCliente" placeholder="Rua, número ou bloco" required>
+
+            <button type="submit" id="btnEnviar">Enviar Indicação</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // 1. CONFIGURAÇÃO (Troque pelos seus dados do Supabase)
+        const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const form = document.getElementById('formIndicacao');
+        const btn = document.getElementById('btnEnviar');
+
+        // 2. LÓGICA DE ENVIO
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Desativa o botão para evitar cliques duplos
+            btn.innerText = 'Enviando...';
+            btn.disabled = true;
+
+            const dados = {
+                nome_piscineiro: document.getElementById('nomePiscineiro').value,
+                whatsapp_piscineiro: document.getElementById('whatsappPiscineiro').value,
+                nome_cliente: document.getElementById('nomeCliente').value,
+                endereco_cliente: document.getElementById('enderecoCliente').value,
+                status: 'Pendente'
+            };
+
+            try {
+                const { error } = await _supabase
+                    .from('indicacoes') // Nome da tabela que criamos no SQL
+                    .insert([dados]);
+
+                if (error) throw error;
+
+                alert('✅ Indicação enviada com sucesso! Entraremos em contato em breve.');
+                form.reset(); // Limpa o formulário
+
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('❌ Erro ao enviar: ' + error.message);
+            } finally {
+                btn.innerText = 'Enviar Indicação';
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
