@@ -13,12 +13,11 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bege); margin: 0; padding: 0; display: flex; justify-content: center; }
         .container { max-width: 450px; width: 100%; padding: 20px; text-align: center; }
         
-        .logo { width: 100px; height: 100px; background: var(--verde-escuro); border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .logo { width: 100px; height: 100px; background: var(--verde-escuro); border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 14px; }
         
         h1 { font-size: 22px; color: var(--verde-escuro); margin-bottom: 5px; }
         p { font-size: 14px; color: #666; margin-bottom: 25px; }
 
-        /* Botões */
         .btn-link { display: block; background: white; color: var(--verde-escuro); text-decoration: none; padding: 18px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #ddd; }
         .btn-link:hover { transform: translateY(-3px); background: var(--verde-escuro); color: white; }
         .btn-destaque { background: var(--verde-escuro); color: white; border: none; }
@@ -45,15 +44,15 @@
     <a href="parceiro.html" class="btn-link">📊 Ver Minhas Indicações</a>
 
     <h2 style="font-size: 16px; color: var(--verde-escuro); margin-top: 40px;">Galeria de Serviços</h2>
-    <p style="margin-bottom: 15px;">Mostre nossas fotos para o seu cliente!</p>
+    <p style="margin-bottom: 15px;">Mostre nosso trabalho para o cliente!</p>
 
     <div class="carousel">
         <div class="slides" id="slides">
-            <div class="slide"><img src="foto1.jpg" alt="Serviço 1"></div>
-            <div class="slide"><img src="foto2.jpg" alt="Serviço 2"></div>
-            <div class="slide"><img src="foto3.jpg" alt="Serviço 3"></div>
-            <div class="slide"><img src="foto4.jpg" alt="Serviço 4"></div>
-            <div class="slide"><img src="foto5.jpg" alt="Serviço 5"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/antes.jpeg" alt="Equipe Ramos"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/depois.jpeg" alt="Antes e Depois"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa.jpeg" alt="Serviço 3"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa2.jpeg" alt="Serviço 4"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa3.jpeg" alt="Serviço 5"></div>
         </div>
     </div>
     <div class="dots" id="dots">
@@ -74,16 +73,15 @@
 
     function showSlide() {
         index++;
-        if (index >= 5) index = 0;
+        if (index >= 5) index = 0; // Se você tiver menos fotos, mude o 5 para a quantidade real
         
         slides.style.transform = `translateX(${-index * 100}%)`;
         
         dots.forEach(dot => dot.classList.remove('active'));
-        dots[index].classList.add('active');
+        if(dots[index]) dots[index].classList.add('active');
     }
 
-    // Muda a foto a cada 3 segundos
-    setInterval(showSlide, 3000);
+    setInterval(showSlide, 3500); // Troca a cada 3.5 segundos
 </script>
 
 </body>
