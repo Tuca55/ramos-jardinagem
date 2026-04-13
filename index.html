@@ -75,6 +75,9 @@
             <label>Nome do Cliente</label>
             <input type="text" id="nomeCliente" placeholder="Dono da residência" required>
 
+            <label>Telefone do Cliente (Opcional)</label>
+            <input type="tel" id="telefoneCliente" placeholder="Fixo ou Celular">
+
             <label>Endereço ou Condomínio</label>
             <input type="text" id="enderecoCliente" placeholder="Rua, número ou bloco" required>
 
@@ -85,7 +88,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // 1. CONFIGURAÇÃO (Troque pelos seus dados do Supabase)
         const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -93,11 +95,9 @@
         const form = document.getElementById('formIndicacao');
         const btn = document.getElementById('btnEnviar');
 
-        // 2. LÓGICA DE ENVIO
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // Desativa o botão para evitar cliques duplos
             btn.innerText = 'Enviando...';
             btn.disabled = true;
 
@@ -105,19 +105,20 @@
                 nome_piscineiro: document.getElementById('nomePiscineiro').value,
                 whatsapp_piscineiro: document.getElementById('whatsappPiscineiro').value,
                 nome_cliente: document.getElementById('nomeCliente').value,
+                telefone_cliente: document.getElementById('telefoneCliente').value || 'Não informado',
                 endereco_cliente: document.getElementById('enderecoCliente').value,
                 status: 'Pendente'
             };
 
             try {
                 const { error } = await _supabase
-                    .from('indicacoes') // Nome da tabela que criamos no SQL
+                    .from('indicacoes')
                     .insert([dados]);
 
                 if (error) throw error;
 
                 alert('✅ Indicação enviada com sucesso! Entraremos em contato em breve.');
-                form.reset(); // Limpa o formulário
+                form.reset();
 
             } catch (error) {
                 console.error('Erro:', error);
