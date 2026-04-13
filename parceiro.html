@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Parceiro - Ramos Jardinagem</title>
+    <style>
+        :root {
+            --verde-escuro: #2d5a27;
+            --verde-claro: #8eb057;
+            --bege: #f4f1ea;
+        }
+        body { font-family: sans-serif; background-color: var(--bege); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        h2 { color: var(--verde-escuro); text-align: center; }
+        .login-box { text-align: center; margin-bottom: 20px; }
+        input { width: 80%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; }
+        .btn { background: var(--verde-escuro); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 85%; }
+
+        .card-indicacao { border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-top: 15px; background: #fafafa; position: relative; }
+        .status { font-size: 12px; font-weight: bold; padding: 4px 8px; border-radius: 5px; position: absolute; top: 15px; right: 15px; }
+        .status-PAGO { background: #d1e7dd; color: #0f5132; }
+        .status-PENDENTE { background: #fff3cd; color: #856404; }
+        
+        .valor-comissao { color: var(--verde-escuro); font-weight: bold; font-size: 18px; margin-top: 10px; display: block; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🌿 Área do Parceiro</h2>
+    <p style="text-align: center; font-size: 14px; color: #666;">Acompanhe suas indicações e comissões</p>
+
+    <div id="telaLogin" class="login-box">
+        <label>Digite seu WhatsApp cadastrado:</label><br><br>
+        <input type="tel" id="whatsLogin" placeholder="(00) 00000-0000">
+        <button class="btn" onclick="acessarPainel()">Visualizar Minhas Indicações</button>
+    </div>
+
+    <div id="painelDados" class="hidden">
+        <div id="resumoGeral" style="background: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; border: 1px solid var(--verde-claro);">
+            <small>Total a Receber:</small>
+            <div id="totalPendente" style="font-size: 24px; font-weight: bold; color: var(--verde-escuro);">R$ 0,00</div>
+        </div>
+        
+        <div id="listaIndicacoes">
+            </div>
+        
+        <button class="btn" onclick="location.reload()" style="background:#666; margin-top: 20px;">Sair / Voltar</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function acessarPainel() {
+        const whats = document.getElementById('whatsLogin').value.trim();
+        if(!whats) return alert('Digite seu WhatsApp');
+
+        const { data, error } = await _supabase
+            .from('indicacoes')
+            .select('*')
+            .eq('whatsapp_piscineiro', whats)
+            .order('created_at', { ascending: false });
+
+        if (error) return alert('Erro ao buscar dados');
+        if (data.length === 0) return alert('Nenhuma indicação encontrada para este número.');
+
+        document.getElementById('telaLogin').classList.add('hidden');
+        document.getElementById('painelDados').classList.remove('hidden');
+
+        const lista = document.getElementById('listaIndicacoes');
+        let total = 0;
+        lista.innerHTML = '<h4>Minhas Indicações:</h4>';
+
+        data.forEach(item => {
+            const comissao = (item.valor_servico || 0) * 0.10;
+            const statusLabel = item.comissao_paga ? 'PAGO' : 'PENDENTE';
+            
+            if (!item.comissao_paga) total += comissao;
+
+            lista.innerHTML += `
+                <div class="card-indicacao">
+                    <span class="status status-${statusLabel}">${statusLabel}</span>
+                    <strong>Cliente:</strong> ${item.nome_cliente}<br>
+                    <small>${new Date(item.created_at).toLocaleDateString()}</small><br>
+                    <span class="valor-comissao">Sua Comissão: R$ ${comissao.toFixed(2)}</span>
+                </div>
+            `;
+        });
+
+        document.getElementById('totalPendente').innerText = `R$ ${total.toLocaleString('pt-br', {minimumFractionDigits: 2})}`;
+    }
+</script>
+</body>
+</html>
