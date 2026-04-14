@@ -13,15 +13,19 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bege); margin: 0; padding: 0; display: flex; justify-content: center; }
         .container { max-width: 450px; width: 100%; padding: 20px; text-align: center; }
         
-        /* Ajuste da Logo com Imagem */
-        .logo-img { width: 120px; height: auto; margin: 20px auto; display: block; border-radius: 15px; }
+        .logo-img { width: 140px; height: auto; margin: 10px auto 20px; display: block; border-radius: 15px; }
         
-        h1 { font-size: 22px; color: var(--verde-escuro); margin-bottom: 8px; }
+        h1 { font-size: 24px; color: var(--verde-escuro); margin-bottom: 8px; }
         .bio { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 25px; padding: 0 10px; }
 
         .btn-link { display: block; background: white; color: var(--verde-escuro); text-decoration: none; padding: 18px; border-radius: 12px; margin-bottom: 15px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #ddd; }
         .btn-link:hover { transform: translateY(-3px); background: var(--verde-escuro); color: white; }
+        
+        /* Botão Destaque Principal */
         .btn-destaque { background: var(--verde-escuro); color: white; border: none; }
+        
+        /* Botão Portfólio - Diferenciado */
+        .btn-portfolio { background: var(--verde-claro); color: white; border: none; }
 
         /* Carrossel */
         .carousel { width: 100%; overflow: hidden; border-radius: 15px; margin-top: 30px; position: relative; box-shadow: 0 8px 15px rgba(0,0,0,0.15); background: #fff; }
@@ -37,7 +41,7 @@
 <body>
 
 <div class="container">
-    <img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/Logo_sozinho.png" alt="Logo Ramos Jardinagem" class="logo-img">
+    <img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/Logo500x500.jpg" alt="Logo Ramos Jardinagem" class="logo-img">
     
     <h1>Ramos Jardinagem</h1>
     <p class="bio">
@@ -47,6 +51,7 @@
     </p>
 
     <a href="index.html" class="btn-link btn-destaque">➕ Indicar Novo Cliente</a>
+    <a href="portfolio.html" class="btn-link btn-portfolio">🌿 Ver Nosso Portfólio</a>
     <a href="parceiro.html" class="btn-link">📊 Ver Minhas Indicações</a>
 
     <h2 style="font-size: 16px; color: var(--verde-escuro); margin-top: 40px;">Galeria de Serviços</h2>
@@ -56,9 +61,9 @@
         <div class="slides" id="slides">
             <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/antes.jpeg" alt="Antes"></div>
             <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/depois.jpeg" alt="Depois"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/logo.png" alt="Equipe Ramos"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/e3quipe (1).png" alt="Nossa Equipe"></div>
-            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/e3quipe (2).png" alt="Excelência no Serviço"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/chefa.jpeg" alt="Equipe Ramos"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/image_0def07.jpg" alt="Nossa Equipe"></div>
+            <div class="slide"><img src="https://raw.githubusercontent.com/Tuca55/ramos-jardinagem/main/Logo500x500.jpg" alt="Marca Ramos"></div>
         </div>
     </div>
     <div class="dots" id="dots">
