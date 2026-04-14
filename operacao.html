@@ -3,77 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operação Diária - Ramos Jardinagem</title>
+    <title>Operação de Equipes - Ramos Jardinagem</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --verde-escuro: #2d5a27;
-            --verde-claro: #8eb057;
             --fundo: #f0f2f5;
             --perigo: #c0392b;
             --sucesso: #27ae60;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); margin: 0; padding: 15px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1300px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
         header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
         
         .resumo-financeiro { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card-financeiro { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .card-financeiro span { display: block; font-size: 0.75rem; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        .card-financeiro strong { font-size: 1.3rem; color: var(--verde-escuro); }
+        .card-financeiro { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 10px; text-align: center; }
+        .card-financeiro span { font-size: 12px; font-weight: bold; color: #666; }
+        .card-financeiro strong { font-size: 1.3rem; color: var(--verde-escuro); display: block; }
 
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 800px; }
-        th { background: var(--verde-escuro); color: white; padding: 12px; text-align: left; position: sticky; top: 0; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 1000px; }
+        th { background: var(--verde-escuro); color: white; padding: 12px; text-align: center; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
         
-        input, select { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 13px; }
-        input:focus, select:focus { border-color: var(--verde-claro); outline: none; }
+        .col-cliente { text-align: left; width: 180px; }
+        .col-trabalhadores { width: 250px; }
         
-        .badge-lucro { background: #e8f5e9; color: var(--sucesso); padding: 6px; border-radius: 5px; font-weight: bold; display: block; text-align: center; }
-        .status-save { font-size: 11px; color: #999; margin-top: 5px; display: block; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; }
+        .input-nomes { font-size: 12px; background: #fefefe; }
+        .input-qtd { width: 55px !important; font-weight: bold; text-align: center; }
+        .input-valor { text-align: right; font-weight: bold; color: var(--verde-escuro); }
         
-        .btn-voltar { text-decoration: none; color: #666; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        .badge-lucro { background: #e8f5e9; color: var(--sucesso); padding: 8px; border-radius: 5px; font-weight: bold; display: block; }
+        .status-save { font-size: 10px; color: #999; display: block; height: 12px; }
+        
+        .btn-voltar { text-decoration: none; color: #666; font-weight: bold; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h2 style="color: var(--verde-escuro); margin: 0;"><i class="fas fa-mitten"></i> Operação e Custos do Dia</h2>
-        <a href="painel.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</a>
+        <h2 style="color: var(--verde-escuro); margin: 0;"><i class="fas fa-hard-hat"></i> Escala de Trabalho e Custos</h2>
+        <a href="agenda.html" class="btn-voltar"><i class="fas fa-calendar-alt"></i> Voltar para Agenda</a>
     </header>
 
     <div class="resumo-financeiro">
-        <div class="card-financeiro">
-            <span><i class="fas fa-cash-register"></i> Total Bruto</span>
-            <strong id="brutoTotal">R$ 0,00</strong>
-        </div>
-        <div class="card-financeiro">
-            <span><i class="fas fa-users-cog"></i> Mão de Obra</span>
-            <strong id="custoTotal" style="color: var(--perigo);">R$ 0,00</strong>
-        </div>
-        <div class="card-financeiro" style="border-bottom: 4px solid var(--sucesso);">
-            <span><i class="fas fa-hand-holding-usd"></i> Lucro Líquido</span>
-            <strong id="lucroTotal" style="color: var(--sucesso);">R$ 0,00</strong>
-        </div>
+        <div class="card-financeiro"><span>FATURAMENTO DO DIA</span><strong id="brutoTotal">R$ 0,00</strong></div>
+        <div class="card-financeiro"><span>TOTAL EM DIÁRIAS</span><strong id="custoTotal" style="color: var(--perigo);">R$ 0,00</strong></div>
+        <div class="card-financeiro" style="border-bottom: 3px solid var(--sucesso);"><span>LUCRO PREVISTO</span><strong id="lucroTotal" style="color: var(--sucesso);">R$ 0,00</strong></div>
     </div>
 
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th>CLIENTE</th>
-                    <th>NOME PROFISSIONAL</th>
-                    <th>TIPO DIÁRIA</th>
-                    <th>VALOR COBRADO (R$)</th>
-                    <th>CUSTO M.O.</th>
-                    <th>LUCRO</th>
+                    <th class="col-cliente">CLIENTE</th>
+                    <th class="col-trabalhadores">TRABALHADORES DESIGNADOS</th>
+                    <th>VALOR COBRADO</th>
+                    <th>OFICIAIS (100)</th>
+                    <th>AJUDANTES (60)</th>
+                    <th>TOTAL M.O.</th>
+                    <th>LUCRO LÍQUIDO</th>
                 </tr>
             </thead>
-            <tbody id="corpoOperacao">
-                </tbody>
+            <tbody id="corpoOperacao"></tbody>
         </table>
     </div>
 </div>
@@ -87,94 +82,59 @@
     const hoje = new Date().toISOString().split('T')[0];
 
     async function carregarOperacao() {
-        // Busca apenas serviços agendados para hoje
-        let { data, error } = await _supabase
-            .from('indicacoes')
-            .select('*')
-            .eq('data_agendamento', hoje);
-
+        let { data } = await _supabase.from('indicacoes').select('*').eq('data_agendamento', hoje);
         const corpo = document.getElementById('corpoOperacao');
         corpo.innerHTML = '';
 
-        if (data.length === 0) {
-            corpo.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:40px; color:#999;">Nenhuma equipe escalada para hoje. Marque serviços na Agenda primeiro.</td></tr>';
-            return;
-        }
-
         data.forEach(item => {
-            const valServico = item.valor_total_servico || 0;
-            const valDiaria = item.valor_diaria_paga || 0;
-            const lucro = valServico - valDiaria;
+            const m_obra = (item.qtd_oficial * 100) + (item.qtd_ajudante * 60);
+            const lucro = (item.valor_total_servico || 0) - m_obra;
 
             corpo.innerHTML += `
-                <tr id="linha-${item.id}">
-                    <td><strong>${item.nome_cliente}</strong></td>
-                    <td>
-                        <input type="text" id="prof-${item.id}" value="${item.profissional_nome || ''}" placeholder="Ex: Marcos" onblur="salvar(${item.id})">
+                <tr>
+                    <td class="col-cliente"><strong>${item.nome_cliente}</strong><br><span id="status-${item.id}" class="status-save"></span></td>
+                    <td class="col-trabalhadores">
+                        <input type="text" class="input-nomes" id="nomes-${item.id}" value="${item.profissional_nome || ''}" placeholder="Ex: João, Marcos, Silva..." onblur="salvar(${item.id})">
                     </td>
-                    <td>
-                        <select id="tipo-${item.id}" onchange="salvar(${item.id})">
-                            <option value="0" ${item.tipo_mao_de_obra == null ? 'selected' : ''}>Selecione...</option>
-                            <option value="100" ${item.tipo_mao_de_obra == 'Oficial' ? 'selected' : ''}>Oficial (R$ 100)</option>
-                            <option value="60" ${item.tipo_mao_de_obra == 'Ajudante' ? 'selected' : ''}>Ajudante (R$ 60)</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" id="valor-${item.id}" value="${valServico}" step="0.01" onblur="salvar(${item.id})">
-                    </td>
-                    <td id="diaria-label-${item.id}">R$ ${valDiaria.toFixed(2)}</td>
-                    <td>
-                        <span class="badge-lucro" id="saldo-${item.id}">R$ ${lucro.toFixed(2)}</span>
-                        <span id="status-${item.id}" class="status-save"></span>
-                    </td>
-                </tr>
-            `;
+                    <td><input type="number" class="input-valor" id="valor-${item.id}" value="${item.valor_total_servico || 0}" onblur="salvar(${item.id})"></td>
+                    <td><input type="number" class="input-qtd" id="oficial-${item.id}" value="${item.qtd_oficial || 0}" onblur="salvar(${item.id})"></td>
+                    <td><input type="number" class="input-qtd" id="ajudante-${item.id}" value="${item.qtd_ajudante || 0}" onblur="salvar(${item.id})"></td>
+                    <td id="mo-${item.id}">R$ ${m_obra.toFixed(2)}</td>
+                    <td><span class="badge-lucro" id="lucro-${item.id}">R$ ${lucro.toFixed(2)}</span></td>
+                </tr>`;
         });
-        atualizarTotaisRapido();
+        atualizarTotais();
     }
 
     async function salvar(id) {
-        const nomeProf = document.getElementById(`prof-${id}`).value;
-        const select = document.getElementById(`tipo-${id}`);
-        const diariaVal = parseFloat(select.value);
-        const tipoTexto = select.options[select.selectedIndex].text.split(' ')[0];
-        const valorServ = parseFloat(document.getElementById(`valor-${id}`).value) || 0;
-        
-        const statusTxt = document.getElementById(`status-${id}`);
-        statusTxt.innerText = "Salvando...";
+        const nomes = document.getElementById(`nomes-${id}`).value;
+        const v_serv = parseFloat(document.getElementById(`valor-${id}`).value) || 0;
+        const q_of = parseInt(document.getElementById(`oficial-${id}`).value) || 0;
+        const q_aj = parseInt(document.getElementById(`ajudante-${id}`).value) || 0;
+        const m_obra = (q_of * 100) + (q_aj * 60);
 
-        const { error } = await _supabase
-            .from('indicacoes')
-            .update({ 
-                profissional_nome: nomeProf,
-                tipo_mao_de_obra: tipoTexto === 'Selecione...' ? null : tipoTexto,
-                valor_diaria_paga: diariaVal,
-                valor_total_servico: valorServ
-            })
-            .eq('id', id);
+        document.getElementById(`status-${id}`).innerText = "Salvando...";
+
+        const { error } = await _supabase.from('indicacoes').update({ 
+            profissional_nome: nomes,
+            valor_total_servico: v_serv,
+            qtd_oficial: q_of,
+            qtd_ajudante: q_aj,
+            valor_diaria_paga: m_obra 
+        }).eq('id', id);
 
         if (!error) {
-            statusTxt.innerText = "✅ Salvo";
-            const lucro = valorServ - diariaVal;
-            document.getElementById(`diaria-label-${id}`).innerText = `R$ ${diariaVal.toFixed(2)}`;
-            document.getElementById(`saldo-${id}`).innerText = `R$ ${lucro.toFixed(2)}`;
-            atualizarTotaisRapido();
-        } else {
-            statusTxt.innerText = "❌ Erro ao salvar";
+            document.getElementById(`status-${id}`).innerText = "✅ Salvo";
+            document.getElementById(`mo-${id}`).innerText = `R$ ${m_obra.toFixed(2)}`;
+            document.getElementById(`lucro-${id}`).innerText = `R$ ${(v_serv - m_obra).toFixed(2)}`;
+            atualizarTotais();
         }
     }
 
-    function atualizarTotaisRapido() {
-        let bruto = 0;
-        let custo = 0;
-
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            bruto += parseFloat(input.value) || 0;
-        });
-
-        document.querySelectorAll('select').forEach(select => {
-            custo += parseFloat(select.value) || 0;
-        });
+    function atualizarTotais() {
+        let bruto = 0, custo = 0;
+        document.querySelectorAll('.input-valor').forEach(i => bruto += parseFloat(i.value) || 0);
+        document.querySelectorAll('[id^="mo-"]').forEach(td => custo += parseFloat(td.innerText.replace('R$ ', '')) || 0);
 
         document.getElementById('brutoTotal').innerText = `R$ ${bruto.toFixed(2)}`;
         document.getElementById('custoTotal').innerText = `R$ ${custo.toFixed(2)}`;
