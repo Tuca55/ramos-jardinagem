@@ -21,16 +21,18 @@
         .card-financeiro strong { font-size: 1.3rem; color: var(--verde-escuro); display: block; }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th { background: var(--verde-escuro); color: white; padding: 10px; }
+        th { background: var(--verde-escuro); color: white; padding: 10px; text-align: center; }
         td { padding: 8px; border-bottom: 1px solid #eee; }
         
-        .worker-box { display: flex; gap: 5px; margin-bottom: 3px; align-items: center; }
+        .worker-box { display: flex; gap: 5px; margin-bottom: 3px; align-items: center; justify-content: center; }
         .input-name { width: 120px; padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        .select-type { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        .input-val-total { width: 90px; font-weight: bold; padding: 8px; border: 1px solid var(--verde-escuro); border-radius: 5px; text-align: center; }
+        .select-type { padding: 5px; border: 1px solid #ccc; border-radius: 4px; background: white; }
+        .input-val-total { width: 100px; font-weight: bold; padding: 8px; border: 2px solid var(--verde-escuro); border-radius: 5px; text-align: center; font-size: 14px; }
         
         .badge-lucro { background: #e8f5e9; color: var(--sucesso); padding: 10px; border-radius: 5px; font-weight: bold; display: block; text-align: center; font-size: 14px; }
-        .status-save { font-size: 10px; color: #999; display: block; }
+        .status-save { font-size: 10px; color: #999; display: block; text-align: center; margin-top: 4px; }
+        
+        tr:hover { background-color: #f9f9f9; }
     </style>
 </head>
 <body>
@@ -38,21 +40,21 @@
 <div class="container">
     <header>
         <h2 style="color: var(--verde-escuro); margin: 0;">💰 Pagamento de Equipes e Lucro</h2>
-        <a href="agenda.html" style="text-decoration: none; color: #666; font-weight: bold;">⬅ Voltar</a>
+        <a href="agenda.html" style="text-decoration: none; color: #666; font-weight: bold;">⬅ Voltar à Agenda</a>
     </header>
 
     <div class="resumo-financeiro">
-        <div class="card-financeiro"><span>FATURAMENTO</span><strong id="brutoTotal">R$ 0,00</strong></div>
-        <div class="card-financeiro"><span>TOTAL DIÁRIAS</span><strong id="custoTotal" style="color: var(--perigo);">R$ 0,00</strong></div>
-        <div class="card-financeiro"><span>LUCRO LÍQUIDO</span><strong id="lucroTotal" style="color: var(--sucesso);">R$ 0,00</strong></div>
+        <div class="card-financeiro"><span>FATURAMENTO TOTAL</span><strong id="brutoTotal">R$ 0,00</strong></div>
+        <div class="card-financeiro"><span>TOTAL DIÁRIAS (CUSTO)</span><strong id="custoTotal" style="color: var(--perigo);">R$ 0,00</strong></div>
+        <div class="card-financeiro" style="background: #e8f5e9;"><span>LUCRO LÍQUIDO</span><strong id="lucroTotal" style="color: var(--sucesso);">R$ 0,00</strong></div>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th style="text-align: left;">CLIENTE</th>
-                <th>VALOR COBRADO</th>
-                <th>EQUIPE DESIGNADA (Nome / Tipo)</th>
+                <th>VALOR DO SERVIÇO (R$)</th>
+                <th>TRABALHADORES (NOME E FUNÇÃO)</th>
                 <th>TOTAL M.O.</th>
                 <th>LUCRO</th>
             </tr>
@@ -70,83 +72,131 @@
     const hoje = new Date().toISOString().split('T')[0];
 
     async function carregar() {
-        let { data } = await _supabase.from('indicacoes').select('*').eq('data_agendamento', hoje);
+        let { data, error } = await _supabase.from('indicacoes').select('*').eq('data_agendamento', hoje);
         const corpo = document.getElementById('corpoOperacao');
         corpo.innerHTML = '';
 
+        if (!data || data.length === 0) {
+            corpo.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Nenhum serviço para hoje.</td></tr>';
+            return;
+        }
+
         data.forEach(item => {
-            const mo = (item.p1_valor || 0) + (item.p2_valor || 0) + (item.p3_valor || 0);
-            const lucro = (item.valor_total_servico || 0) - mo;
+            const vServico = parseFloat(item.valor_total_servico) || 0;
+            const p1v = parseFloat(item.p1_valor) || 0;
+            const p2v = parseFloat(item.p2_valor) || 0;
+            const p3v = parseFloat(item.p3_valor) || 0;
+            
+            const moTotal = p1v + p2v + p3v;
+            const lucro = vServico - moTotal;
 
             corpo.innerHTML += `
-                <tr>
-                    <td><strong>${item.nome_cliente}</strong><br><span id="st-${item.id}" class="status-save"></span></td>
+                <tr id="linha-${item.id}">
+                    <td style="width: 200px;">
+                        <strong>${item.nome_cliente}</strong>
+                        <span id="st-${item.id}" class="status-save"></span>
+                    </td>
                     <td style="text-align:center;">
-                        <input type="number" class="input-val-total" id="v-${item.id}" value="${item.valor_total_servico || 0}" onblur="salvar(${item.id})">
+                        <input type="number" class="input-val-total" id="v-${item.id}" 
+                               value="${vServico}" oninput="calcularLinha(${item.id})" onblur="salvar(${item.id})">
                     </td>
                     <td>
                         <div class="worker-box">
-                            <input type="text" class="input-name" id="p1n-${item.id}" placeholder="Nome 1" value="${item.p1_nome || ''}" onblur="salvar(${item.id})">
-                            <select class="select-type" id="p1v-${item.id}" onchange="salvar(${item.id})">
+                            <input type="text" class="input-name" id="p1n-${item.id}" placeholder="Nome" value="${item.p1_nome || ''}" onblur="salvar(${item.id})">
+                            <select class="select-type" id="p1v-${item.id}" onchange="calcularLinha(${item.id}); salvar(${item.id})">
                                 <option value="0">Off</option>
-                                <option value="100" ${item.p1_valor == 100 ? 'selected' : ''}>Oficial (100)</option>
-                                <option value="60" ${item.p1_valor == 60 ? 'selected' : ''}>Ajudante (60)</option>
+                                <option value="100" ${p1v == 100 ? 'selected' : ''}>Oficial (100)</option>
+                                <option value="60" ${p1v == 60 ? 'selected' : ''}>Ajudante (60)</option>
                             </select>
                         </div>
                         <div class="worker-box">
-                            <input type="text" class="input-name" id="p2n-${item.id}" placeholder="Nome 2" value="${item.p2_nome || ''}" onblur="salvar(${item.id})">
-                            <select class="select-type" id="p2v-${item.id}" onchange="salvar(${item.id})">
+                            <input type="text" class="input-name" id="p2n-${item.id}" placeholder="Nome" value="${item.p2_nome || ''}" onblur="salvar(${item.id})">
+                            <select class="select-type" id="p2v-${item.id}" onchange="calcularLinha(${item.id}); salvar(${item.id})">
                                 <option value="0">Off</option>
-                                <option value="100" ${item.p2_valor == 100 ? 'selected' : ''}>Oficial (100)</option>
-                                <option value="60" ${item.p2_valor == 60 ? 'selected' : ''}>Ajudante (60)</option>
+                                <option value="100" ${p2v == 100 ? 'selected' : ''}>Oficial (100)</option>
+                                <option value="60" ${p2v == 60 ? 'selected' : ''}>Ajudante (60)</option>
                             </select>
                         </div>
                         <div class="worker-box">
-                            <input type="text" class="input-name" id="p3n-${item.id}" placeholder="Nome 3" value="${item.p3_nome || ''}" onblur="salvar(${item.id})">
-                            <select class="select-type" id="p3v-${item.id}" onchange="salvar(${item.id})">
+                            <input type="text" class="input-name" id="p3n-${item.id}" placeholder="Nome" value="${item.p3_nome || ''}" onblur="salvar(${item.id})">
+                            <select class="select-type" id="p3v-${item.id}" onchange="calcularLinha(${item.id}); salvar(${item.id})">
                                 <option value="0">Off</option>
-                                <option value="100" ${item.p3_valor == 100 ? 'selected' : ''}>Oficial (100)</option>
-                                <option value="60" ${item.p3_valor == 60 ? 'selected' : ''}>Ajudante (60)</option>
+                                <option value="100" ${p3v == 100 ? 'selected' : ''}>Oficial (100)</option>
+                                <option value="60" ${p3v == 60 ? 'selected' : ''}>Ajudante (60)</option>
                             </select>
                         </div>
                     </td>
-                    <td style="text-align:center; font-weight:bold;" id="mo-${item.id}">R$ ${mo.toFixed(2)}</td>
-                    <td><span class="badge-lucro" id="lu-${item.id}">R$ ${lucro.toFixed(2)}</span></td>
+                    <td style="text-align:center; font-weight:bold; font-size:14px; color:var(--perigo);" id="mo-${item.id}">
+                        R$ ${moTotal.toFixed(2)}
+                    </td>
+                    <td>
+                        <span class="badge-lucro" id="lu-${item.id}">R$ ${lucro.toFixed(2)}</span>
+                    </td>
                 </tr>`;
         });
-        totais();
+        totaisGerais();
+    }
+
+    // Calcula os valores na linha IMEDIATAMENTE ao digitar
+    function calcularLinha(id) {
+        const vTotal = parseFloat(document.getElementById(`v-${id}`).value) || 0;
+        const p1 = parseFloat(document.getElementById(`p1v-${id}`).value) || 0;
+        const p2 = parseFloat(document.getElementById(`p2v-${id}`).value) || 0;
+        const p3 = parseFloat(document.getElementById(`p3v-${id}`).value) || 0;
+
+        const mo = p1 + p2 + p3;
+        const lucro = vTotal - mo;
+
+        document.getElementById(`mo-${id}`).innerText = `R$ ${mo.toFixed(2)}`;
+        document.getElementById(`lu-${id}`).innerText = `R$ ${lucro.toFixed(2)}`;
+        
+        totaisGerais();
     }
 
     async function salvar(id) {
         const dados = {
             valor_total_servico: parseFloat(document.getElementById(`v-${id}`).value) || 0,
             p1_nome: document.getElementById(`p1n-${id}`).value,
-            p1_valor: parseFloat(document.getElementById(`p1v-${id}`).value),
+            p1_valor: parseFloat(document.getElementById(`p1v-${id}`).value) || 0,
             p2_nome: document.getElementById(`p2n-${id}`).value,
-            p2_valor: parseFloat(document.getElementById(`p2v-${id}`).value),
+            p2_valor: parseFloat(document.getElementById(`p2v-${id}`).value) || 0,
             p3_nome: document.getElementById(`p3n-${id}`).value,
-            p3_valor: parseFloat(document.getElementById(`p3v-${id}`).value)
+            p3_valor: parseFloat(document.getElementById(`p3v-${id}`).value) || 0
         };
 
-        document.getElementById(`st-${id}`).innerText = "Salvando...";
+        const statusLabel = document.getElementById(`st-${id}`);
+        statusLabel.innerText = "⏳ Salvando...";
+        
         const { error } = await _supabase.from('indicacoes').update(dados).eq('id', id);
 
         if (!error) {
-            document.getElementById(`st-${id}`).innerText = "✅ Salvo";
-            const mo = dados.p1_valor + dados.p2_valor + dados.p3_valor;
-            document.getElementById(`mo-${id}`).innerText = `R$ ${mo.toFixed(2)}`;
-            document.getElementById(`lu-${id}`).innerText = `R$ ${(dados.valor_total_servico - mo).toFixed(2)}`;
-            totais();
+            statusLabel.innerText = "✅ Salvo";
+            setTimeout(() => { statusLabel.innerText = ""; }, 2000);
+        } else {
+            statusLabel.innerText = "❌ Erro";
         }
     }
 
-    function totais() {
-        let b = 0, c = 0;
-        document.querySelectorAll('.input-val-total').forEach(i => b += parseFloat(i.value) || 0);
-        document.querySelectorAll('[id^="mo-"]').forEach(td => c += parseFloat(td.innerText.replace('R$ ', '')) || 0);
-        document.getElementById('brutoTotal').innerText = `R$ ${b.toFixed(2)}`;
-        document.getElementById('custoTotal').innerText = `R$ ${c.toFixed(2)}`;
-        document.getElementById('lucroTotal').innerText = `R$ ${(b - c).toFixed(2)}`;
+    function totaisGerais() {
+        let faturamento = 0;
+        let custos = 0;
+
+        // Soma faturamento
+        document.querySelectorAll('.input-val-total').forEach(input => {
+            faturamento += parseFloat(input.value) || 0;
+        });
+
+        // Soma custos (M.O.)
+        document.querySelectorAll('[id^="mo-"]').forEach(cell => {
+            const val = cell.innerText.replace('R$ ', '').replace(',', '.');
+            custos += parseFloat(val) || 0;
+        });
+
+        const lucroFinal = faturamento - custos;
+
+        document.getElementById('brutoTotal').innerText = `R$ ${faturamento.toFixed(2)}`;
+        document.getElementById('custoTotal').innerText = `R$ ${custos.toFixed(2)}`;
+        document.getElementById('lucroTotal').innerText = `R$ ${lucroFinal.toFixed(2)}`;
     }
 
     carregar();
