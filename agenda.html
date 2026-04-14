@@ -3,94 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda de Operações - Ramos Jardinagem</title>
+    <title>Agenda de Serviços - Ramos Jardinagem</title>
     <style>
         :root {
             --verde-escuro: #2d5a27;
             --verde-claro: #8eb057;
             --pendente: #f39c12;
             --concluido: #27ae60;
-            --hoje-bg: #fff9e6;
             --fundo: #f4f7f6;
+            --hoje-bg: #fff5e6; /* Cor de destaque para hoje */
         }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 15px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
-        h2 { color: var(--verde-escuro); margin: 0; font-size: 1.4rem; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        h2 { color: var(--verde-escuro); margin: 0; }
 
-        /* Painel de Resumo do Dia */
-        .resumo-dia { background: var(--verde-escuro); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; }
-        .resumo-dia div span { display: block; font-size: 1.5rem; font-weight: bold; }
+        /* Banner de Resumo do Dia */
+        .painel-hoje { background: var(--verde-escuro); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
+        .contador-circulo { background: var(--pendente); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
 
-        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-        label { font-weight: bold; color: var(--verde-escuro); font-size: 14px; }
+        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
 
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
-        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; color: #555; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
 
-        .linha-hoje { background-color: var(--hoje-bg) !important; font-weight: 500; border-left: 5px solid var(--pendente); }
-        
-        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; font-size: 11px; text-transform: uppercase; }
+        /* Estilo para a linha de HOJE */
+        .linha-hoje { background-color: var(--hoje-bg) !important; border-left: 5px solid var(--pendente); }
+        .badge-hoje { background: var(--pendente); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
+
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; font-size: 12px; }
         .btn-whats { background: #25d366; color: white; }
         
-        @media (max-width: 600px) {
-            .resumo-dia { flex-direction: column; gap: 10px; }
-        }
+        tr:hover { background: #f9f9f9; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h2>📅 Agenda de Operações</h2>
-        <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px; font-weight: bold;">⬅ Voltar</a>
+        <h2>📅 Agenda de Serviços</h2>
+        <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px;">⬅ Voltar ao Painel</a>
     </header>
 
-    <div class="resumo-dia">
+    <div class="painel-hoje">
+        <div class="contador-circulo" id="numHoje">0</div>
         <div>
-            <span id="countHoje">0</span>
-            SERVIÇOS HOJE
-        </div>
-        <div>
-            <span id="dataAtual">--/--</span>
-            DATA ATUAL
+            <strong>Atendimentos Programados para Hoje</strong><br>
+            <small id="dataAtualLabel"></small>
         </div>
     </div>
 
     <div class="controles">
-        <div>
-            <label>Filtrar Data:</label>
-            <input type="date" id="filtroData" onchange="carregarAgenda()">
-        </div>
-        <div>
-            <label>Status:</label>
-            <select id="filtroStatus" onchange="carregarAgenda()">
-                <option value="">Todos</option>
-                <option value="Agendado" selected>Agendados</option>
-                <option value="Concluido">Concluídos</option>
-            </select>
-        </div>
-        <button onclick="limparFiltros()" style="cursor:pointer; background:none; border:1px solid #ccc; padding:8px; border-radius:8px; font-size:12px;">Limpar Filtros</button>
+        <input type="date" id="filtroData" onchange="carregarAgenda()">
+        <select id="filtroStatus" onchange="carregarAgenda()">
+            <option value="">Todos os Status</option>
+            <option value="Agendado">Somente Agendados</option>
+            <option value="Concluido">Concluídos</option>
+        </select>
+        <button onclick="limparFiltros()" style="border:none; background:none; color:blue; cursor:pointer; font-size:12px;">Ver Todos os Clientes</button>
     </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>DATA</th>
-                    <th>CLIENTE</th>
-                    <th>LOCALIZAÇÃO</th>
-                    <th>STATUS</th>
-                    <th>DESPACHAR</th>
-                </tr>
-            </thead>
-            <tbody id="corpoAgenda"></tbody>
-        </table>
-    </div>
+    <table id="tabelaAgenda">
+        <thead>
+            <tr>
+                <th>DATA</th>
+                <th>CLIENTE</th>
+                <th>ENDEREÇO</th>
+                <th>STATUS</th>
+                <th>AÇÕES</th>
+            </tr>
+        </thead>
+        <tbody id="corpoAgenda"></tbody>
+    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -99,14 +86,9 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Pega a data de hoje no formato YYYY-MM-DD para o input e comparação
-    const hojeObj = new Date();
-    const hojeISO = hojeObj.toISOString().split('T')[0];
-    
-    // Mostra a data formatada no painel
-    document.getElementById('dataAtual').innerText = hojeObj.toLocaleDateString('pt-BR');
-    // Inicia o filtro de data com o dia de hoje
-    document.getElementById('filtroData').value = hojeISO;
+    // Identificar a data de hoje (Brasília/Local)
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('dataAtualLabel').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
     async function carregarAgenda() {
         let { data, error } = await _supabase.from('indicacoes').select('*').order('data_agendamento', { ascending: true });
@@ -116,42 +98,50 @@
         const corpo = document.getElementById('corpoAgenda');
         corpo.innerHTML = '';
 
-        let contadorHoje = 0;
+        let totalHoje = 0;
 
         data.forEach(item => {
-            // Contagem para o resumo (apenas agendados para hoje)
-            if (item.data_agendamento === hojeISO && item.status_servico !== 'Concluido') {
-                contadorHoje++;
+            // Contagem para o painel de hoje
+            if (item.data_agendamento === hoje && item.status_servico !== 'Concluido') {
+                totalHoje++;
             }
 
-            // Aplicar filtros da tela
+            // Aplicação dos filtros se o usuário selecionar algo
             if (filtroData && item.data_agendamento !== filtroData) return;
             if (filtroStatus && item.status_servico !== filtroStatus) return;
 
-            const ehHoje = item.data_agendamento === hojeISO;
+            const ehHoje = item.data_agendamento === hoje;
             const dataFormatada = item.data_agendamento ? new Date(item.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR') : 'A definir';
             
-            const msgZap = encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Nossa equipe já está se preparando para o seu serviço de hoje. Previsão de chegada em breve! 🌿`);
+            // Mensagem de WhatsApp dinâmica
+            const msgZap = ehHoje 
+                ? encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Nossa equipe está saindo agora para realizar seu serviço hoje. 🚀`)
+                : encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Confirmando nosso serviço agendado para o dia ${dataFormatada}. Podemos ir?`);
 
             corpo.innerHTML += `
                 <tr class="${ehHoje ? 'linha-hoje' : ''}">
-                    <td><input type="date" value="${item.data_agendamento || ''}" onchange="atualizarData(${item.id}, this.value)"></td>
+                    <td>
+                        <input type="date" value="${item.data_agendamento || ''}" onchange="atualizarData(${item.id}, this.value)">
+                        ${ehHoje ? '<span class="badge-hoje">HOJE</span>' : ''}
+                    </td>
                     <td><strong>${item.nome_cliente}</strong></td>
                     <td><small>${item.endereco_cliente}</small></td>
                     <td>
-                        <select onchange="atualizarStatus(${item.id}, this.value)" style="border-color: ${item.status_servico === 'Concluido' ? 'var(--concluido)' : 'var(--pendente)'}">
+                        <select onchange="atualizarStatus(${item.id}, this.value)">
                             <option value="Agendado" ${item.status_servico === 'Agendado' ? 'selected' : ''}>Agendado</option>
                             <option value="Concluido" ${item.status_servico === 'Concluido' ? 'selected' : ''}>Concluído</option>
                         </select>
                     </td>
                     <td>
-                        <a href="https://wa.me/55${item.telefone_cliente.replace(/\D/g,'')}?text=${msgZap}" target="_blank" class="btn btn-whats">🚀 A Caminho</a>
+                        <a href="https://wa.me/55${item.telefone_cliente.replace(/\D/g,'')}?text=${msgZap}" target="_blank" class="btn btn-whats">
+                            ${ehHoje ? '🚀 Avisar Envio' : '💬 Confirmar'}
+                        </a>
                     </td>
                 </tr>
             `;
         });
 
-        document.getElementById('countHoje').innerText = contadorHoje;
+        document.getElementById('numHoje').innerText = totalHoje;
     }
 
     async function atualizarData(id, novaData) {
