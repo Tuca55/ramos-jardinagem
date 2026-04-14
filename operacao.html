@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operação Diária - Ramos Jardinagem</title>
+    <style>
+        :root {
+            --verde-escuro: #2d5a27;
+            --verde-claro: #8eb057;
+            --fundo: #f0f2f5;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); margin: 0; padding: 15px; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .resumo-financeiro { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card-financeiro { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 10px; text-align: center; }
+        .card-financeiro span { display: block; font-size: 0.8rem; color: #666; font-weight: bold; }
+        .card-financeiro strong { font-size: 1.2rem; color: var(--verde-escuro); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: var(--verde-escuro); color: white; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        input[type="number"], select { padding: 8px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; }
+        
+        .badge-lucro { background: #e8f5e9; color: #2e7d32; padding: 5px; border-radius: 5px; font-weight: bold; display: block; text-align: center; }
+        
+        .btn-voltar { text-decoration: none; color: #666; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h2 style="color: var(--verde-escuro); margin: 0;">🛠️ Painel de Operação e Custos</h2>
+        <a href="painel.html" class="btn-voltar">⬅ Voltar</a>
+    </header>
+
+    <div class="resumo-financeiro">
+        <div class="card-financeiro">
+            <span>TOTAL BRUTO HOJE</span>
+            <strong id="brutoTotal">R$ 0,00</strong>
+        </div>
+        <div class="card-financeiro">
+            <span>TOTAL MÃO DE OBRA</span>
+            <strong id="custoTotal" style="color: #c0392b;">R$ 0,00</strong>
+        </div>
+        <div class="card-financeiro" style="background: #e8f5e9;">
+            <span>LUCRO PREVISTO</span>
+            <strong id="lucroTotal" style="color: #27ae60;">R$ 0,00</strong>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>CLIENTE</th>
+                <th>PROFISSIONAL</th>
+                <th>TIPO</th>
+                <th>VALOR SERVIÇO</th>
+                <th>DIÁRIA</th>
+                <th>SALDO</th>
+            </tr>
+        </thead>
+        <tbody id="corpoOperacao">
+            </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const hoje = new Date().toISOString().split('T')[0];
+
+    async function carregarOperacao() {
+        // Busca apenas quem é de HOJE e não está concluído
+        let { data, error } = await _supabase
+            .from('indicacoes')
+            .select('*')
+            .eq('data_agendamento', hoje)
+            .neq('status_servico', 'Concluido');
+
+        const corpo = document.getElementById('corpoOperacao');
+        corpo.innerHTML = '';
+
+        if (data.length === 0) {
+            corpo.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#999;">Nenhum serviço agendado para hoje.</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            corpo.innerHTML += `
+                <tr id="linha-${item.id}">
+                    <td><strong>${item.nome_cliente}</strong></td>
+                    <td><input type="text" placeholder="Nome do Profissional" onchange="salvarLocal(${item.id})"></td>
+                    <td>
+                        <select onchange="calcular(${item.id})" id="tipo-${item.id}">
+                            <option value="0">Selecionar...</option>
+                            <option value="100">Oficial (R$ 100)</option>
+                            <option value="60">Ajudante (R$ 60)</option>
+                        </select>
+                    </td>
+                    <td><input type="number" id="valor-${item.id}" placeholder="R$ 0,00" oninput="calcular(${item.id})"></td>
+                    <td id="diaria-${item.id}">R$ 0,00</td>
+                    <td><span class="badge-lucro" id="saldo-${item.id}">R$ 0,00</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    function calcular(id) {
+        const tipo = parseFloat(document.getElementById(`tipo-${id}`).value);
+        const valorServico = parseFloat(document.getElementById(`valor-${id}`).value) || 0;
+        
+        const saldo = valorServico - tipo;
+
+        document.getElementById(`diaria-${id}`).innerText = `R$ ${tipo.toFixed(2)}`;
+        document.getElementById(`saldo-${id}`).innerText = `R$ ${saldo.toFixed(2)}`;
+
+        atualizarTotais();
+    }
+
+    function atualizarTotais() {
+        let bruto = 0;
+        let custo = 0;
+
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            bruto += parseFloat(input.value) || 0;
+        });
+
+        document.querySelectorAll('select').forEach(select => {
+            custo += parseFloat(select.value) || 0;
+        });
+
+        document.getElementById('brutoTotal').innerText = `R$ ${bruto.toFixed(2)}`;
+        document.getElementById('custoTotal').innerText = `R$ ${custo.toFixed(2)}`;
+        document.getElementById('lucroTotal').innerText = `R$ ${(bruto - custo).toFixed(2)}`;
+    }
+
+    carregarOperacao();
+</script>
+</body>
+</html>
