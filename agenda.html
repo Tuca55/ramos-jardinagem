@@ -3,69 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda de Serviços - Ramos Jardinagem</title>
+    <title>Agenda de Operações - Ramos Jardinagem</title>
     <style>
         :root {
             --verde-escuro: #2d5a27;
             --verde-claro: #8eb057;
             --pendente: #f39c12;
             --concluido: #27ae60;
+            --hoje-bg: #fff9e6;
             --fundo: #f4f7f6;
         }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 15px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        h2 { color: var(--verde-escuro); margin: 0; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+        h2 { color: var(--verde-escuro); margin: 0; font-size: 1.4rem; }
 
-        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        /* Painel de Resumo do Dia */
+        .resumo-dia { background: var(--verde-escuro); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; }
+        .resumo-dia div span { display: block; font-size: 1.5rem; font-weight: bold; }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
+        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        label { font-weight: bold; color: var(--verde-escuro); font-size: 14px; }
+
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 600px; }
+        th { background: #eee; padding: 12px; text-align: left; font-size: 13px; color: #555; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
 
-        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; color: white; }
-        .status-agendado { background: var(--pendente); }
-        .status-concluido { background: var(--concluido); }
-
-        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; font-size: 12px; }
-        .btn-whats { background: #25d366; color: white; }
-        .btn-save { background: var(--verde-escuro); color: white; }
+        .linha-hoje { background-color: var(--hoje-bg) !important; font-weight: 500; border-left: 5px solid var(--pendente); }
         
-        tr:hover { background: #f9f9f9; }
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; font-size: 11px; text-transform: uppercase; }
+        .btn-whats { background: #25d366; color: white; }
+        
+        @media (max-width: 600px) {
+            .resumo-dia { flex-direction: column; gap: 10px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h2>📅 Agenda de Serviços</h2>
-        <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px;">⬅ Voltar ao Painel</a>
+        <h2>📅 Agenda de Operações</h2>
+        <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px; font-weight: bold;">⬅ Voltar</a>
     </header>
 
-    <div class="controles">
-        <input type="date" id="filtroData" onchange="carregarAgenda()">
-        <select id="filtroStatus" onchange="carregarAgenda()">
-            <option value="">Todos os Status</option>
-            <option value="Agendado">Agendado</option>
-            <option value="Concluido">Concluído</option>
-        </select>
+    <div class="resumo-dia">
+        <div>
+            <span id="countHoje">0</span>
+            SERVIÇOS HOJE
+        </div>
+        <div>
+            <span id="dataAtual">--/--</span>
+            DATA ATUAL
+        </div>
     </div>
 
-    <table id="tabelaAgenda">
-        <thead>
-            <tr>
-                <th>DATA</th>
-                <th>CLIENTE</th>
-                <th>ENDEREÇO</th>
-                <th>STATUS</th>
-                <th>AÇÕES</th>
-            </tr>
-        </thead>
-        <tbody id="corpoAgenda">
-            </tbody>
-    </table>
+    <div class="controles">
+        <div>
+            <label>Filtrar Data:</label>
+            <input type="date" id="filtroData" onchange="carregarAgenda()">
+        </div>
+        <div>
+            <label>Status:</label>
+            <select id="filtroStatus" onchange="carregarAgenda()">
+                <option value="">Todos</option>
+                <option value="Agendado" selected>Agendados</option>
+                <option value="Concluido">Concluídos</option>
+            </select>
+        </div>
+        <button onclick="limparFiltros()" style="cursor:pointer; background:none; border:1px solid #ccc; padding:8px; border-radius:8px; font-size:12px;">Limpar Filtros</button>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>DATA</th>
+                    <th>CLIENTE</th>
+                    <th>LOCALIZAÇÃO</th>
+                    <th>STATUS</th>
+                    <th>DESPACHAR</th>
+                </tr>
+            </thead>
+            <tbody id="corpoAgenda"></tbody>
+        </table>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -73,6 +98,15 @@
     const SUPABASE_URL = 'https://dxlsknikveslsupngshw.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Pega a data de hoje no formato YYYY-MM-DD para o input e comparação
+    const hojeObj = new Date();
+    const hojeISO = hojeObj.toISOString().split('T')[0];
+    
+    // Mostra a data formatada no painel
+    document.getElementById('dataAtual').innerText = hojeObj.toLocaleDateString('pt-BR');
+    // Inicia o filtro de data com o dia de hoje
+    document.getElementById('filtroData').value = hojeISO;
 
     async function carregarAgenda() {
         let { data, error } = await _supabase.from('indicacoes').select('*').order('data_agendamento', { ascending: true });
@@ -82,31 +116,42 @@
         const corpo = document.getElementById('corpoAgenda');
         corpo.innerHTML = '';
 
+        let contadorHoje = 0;
+
         data.forEach(item => {
-            // Lógica de filtros simples
+            // Contagem para o resumo (apenas agendados para hoje)
+            if (item.data_agendamento === hojeISO && item.status_servico !== 'Concluido') {
+                contadorHoje++;
+            }
+
+            // Aplicar filtros da tela
             if (filtroData && item.data_agendamento !== filtroData) return;
             if (filtroStatus && item.status_servico !== filtroStatus) return;
 
-            const dataFormatada = item.data_agendamento ? new Date(item.data_agendamento).toLocaleDateString('pt-BR') : 'Definir data';
-            const msgZap = encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Confirmando nosso serviço agendado para o dia ${dataFormatada}. Podemos ir?`);
+            const ehHoje = item.data_agendamento === hojeISO;
+            const dataFormatada = item.data_agendamento ? new Date(item.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR') : 'A definir';
+            
+            const msgZap = encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Nossa equipe já está se preparando para o seu serviço de hoje. Previsão de chegada em breve! 🌿`);
 
             corpo.innerHTML += `
-                <tr>
+                <tr class="${ehHoje ? 'linha-hoje' : ''}">
                     <td><input type="date" value="${item.data_agendamento || ''}" onchange="atualizarData(${item.id}, this.value)"></td>
                     <td><strong>${item.nome_cliente}</strong></td>
                     <td><small>${item.endereco_cliente}</small></td>
                     <td>
-                        <select onchange="atualizarStatus(${item.id}, this.value)">
+                        <select onchange="atualizarStatus(${item.id}, this.value)" style="border-color: ${item.status_servico === 'Concluido' ? 'var(--concluido)' : 'var(--pendente)'}">
                             <option value="Agendado" ${item.status_servico === 'Agendado' ? 'selected' : ''}>Agendado</option>
                             <option value="Concluido" ${item.status_servico === 'Concluido' ? 'selected' : ''}>Concluído</option>
                         </select>
                     </td>
                     <td>
-                        <a href="https://wa.me/55${item.telefone_cliente.replace(/\D/g,'')}?text=${msgZap}" target="_blank" class="btn btn-whats">Avisar Cliente</a>
+                        <a href="https://wa.me/55${item.telefone_cliente.replace(/\D/g,'')}?text=${msgZap}" target="_blank" class="btn btn-whats">🚀 A Caminho</a>
                     </td>
                 </tr>
             `;
         });
+
+        document.getElementById('countHoje').innerText = contadorHoje;
     }
 
     async function atualizarData(id, novaData) {
@@ -116,6 +161,12 @@
 
     async function atualizarStatus(id, novoStatus) {
         await _supabase.from('indicacoes').update({ status_servico: novoStatus }).eq('id', id);
+        carregarAgenda();
+    }
+
+    function limparFiltros() {
+        document.getElementById('filtroData').value = '';
+        document.getElementById('filtroStatus').value = '';
         carregarAgenda();
     }
 
