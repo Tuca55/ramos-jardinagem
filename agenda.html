@@ -11,26 +11,40 @@
             --pendente: #f39c12;
             --concluido: #27ae60;
             --fundo: #f4f7f6;
-            --hoje-bg: #fff5e6; /* Cor de destaque para hoje */
+            --hoje-bg: #fff5e6;
         }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fundo); margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         h2 { color: var(--verde-escuro); margin: 0; }
 
-        /* Banner de Resumo do Dia */
+        /* Botão para a Página de Operação */
+        .btn-operacao { 
+            background: var(--verde-escuro); 
+            color: white; 
+            text-decoration: none; 
+            padding: 10px 15px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-operacao:hover { background: var(--verde-claro); transform: translateY(-2px); }
+
         .painel-hoje { background: var(--verde-escuro); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; }
         .contador-circulo { background: var(--pendente); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; }
 
-        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .controles { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         input, select { padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: #eee; padding: 12px; text-align: left; font-size: 13px; }
         td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
 
-        /* Estilo para a linha de HOJE */
         .linha-hoje { background-color: var(--hoje-bg) !important; border-left: 5px solid var(--pendente); }
         .badge-hoje { background: var(--pendente); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 5px; }
 
@@ -45,7 +59,10 @@
 <div class="container">
     <header>
         <h2>📅 Agenda de Serviços</h2>
-        <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px;">⬅ Voltar ao Painel</a>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="operacao.html" class="btn-operacao">🛠️ Ir para Operação</a>
+            <a href="painel.html" style="text-decoration: none; color: #666; font-size: 14px;">⬅ Painel</a>
+        </div>
     </header>
 
     <div class="painel-hoje">
@@ -86,7 +103,6 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4bHNrbmlrdmVzbHN1cG5nc2h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5MjAsImV4cCI6MjA4ODYzNjkyMH0.ffcYhfmi_lYNAPCsPqyfUxexmfsxR_HOS36QtKzL3HM';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Identificar a data de hoje (Brasília/Local)
     const hoje = new Date().toISOString().split('T')[0];
     document.getElementById('dataAtualLabel').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
 
@@ -101,19 +117,16 @@
         let totalHoje = 0;
 
         data.forEach(item => {
-            // Contagem para o painel de hoje
             if (item.data_agendamento === hoje && item.status_servico !== 'Concluido') {
                 totalHoje++;
             }
 
-            // Aplicação dos filtros se o usuário selecionar algo
             if (filtroData && item.data_agendamento !== filtroData) return;
             if (filtroStatus && item.status_servico !== filtroStatus) return;
 
             const ehHoje = item.data_agendamento === hoje;
             const dataFormatada = item.data_agendamento ? new Date(item.data_agendamento + 'T00:00:00').toLocaleDateString('pt-BR') : 'A definir';
             
-            // Mensagem de WhatsApp dinâmica
             const msgZap = ehHoje 
                 ? encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Nossa equipe está saindo agora para realizar seu serviço hoje. 🚀`)
                 : encodeURIComponent(`Olá ${item.nome_cliente}, aqui é da Ramos Jardinagem! Confirmando nosso serviço agendado para o dia ${dataFormatada}. Podemos ir?`);
